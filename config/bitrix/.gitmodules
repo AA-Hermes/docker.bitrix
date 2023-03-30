@@ -1,0 +1,3 @@
+[submodule "docker.bitrix"]
+	path = .docker
+	url = https://github.com/AA-Hermes/docker.bitrix.git

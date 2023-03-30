@@ -41,6 +41,13 @@ services:
             - db:/var/lib/mysql
             - ./logs/php:/var/log/php
             - ./logs/xdebug:/tmp
+            # bitrix template
+            - ./config/bitrix/:/var/www/bitrix/
+            # - ./config/bitrix/bitrix_server_test.php:/var/www/bitrix/bitrix_server_test.php
+            # - ./config/bitrix/bitrixsetup.php:/var/www/bitrix/bitrixsetup.php
+            # - ./config/bitrix/.htaccess:/var/www/bitrix/.htaccess
+            # - ./config/bitrix/.gitignore:/var/www/bitrix/.gitignore
+            # - ./config/bitrix/.gitmodules:/var/www/bitrix/.gitmodules
         links:
             - db
             - memcached
