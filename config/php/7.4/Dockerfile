@@ -15,7 +15,7 @@ RUN apt-get update \
     php7.4-opcache \
     php7.4-zip \
     && pecl install epel-release php-mcrypt \
-    && php-pear php7.4-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config \
+    && php-pear php7.4-dev libmcrypt gcc make autoconf libc-dev pkg-config \
     && docker-php-ext-enable xdebug \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 

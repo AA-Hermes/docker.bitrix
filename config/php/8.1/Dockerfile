@@ -1,4 +1,4 @@
-FROM phpdockerio/php8-fpm:latest
+FROM phpdockerio/php:8.1-fpm
 
 RUN apt-get update \
     && apt-get -y --no-install-recommends install \
@@ -14,7 +14,7 @@ RUN apt-get update \
     php8.1-imagick \
     php8.1-opcache \
     php8.1-zip \
-    php-pear php-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config \
+    php-pear php-dev libmcrypt gcc make autoconf libc-dev pkg-config \
     && pecl install mcrypt-1.0.3 \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
