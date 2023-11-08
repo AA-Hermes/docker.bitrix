@@ -1,13 +1,13 @@
 version: "3.0"
 
 volumes:
-    db:
+    db_path:
         driver: local
         driver_opts:
             o: 'bind'
             type: 'none'
             device: './data/mysql'
-    cache:
+    cache_path:
         driver: local
         driver_opts:
             o: 'bind'
@@ -28,7 +28,6 @@ services:
         container_name: ${PROJECT_NAME}-${WEB_SERVER_TYPE}
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
-            - db:/var/lib/mysql
             - ./logs/${WEB_SERVER_TYPE}:/var/log/${WEB_SERVER_TYPE}
         expose:
             - 80
@@ -46,7 +45,6 @@ services:
         container_name: ${PROJECT_NAME}-php${PHP_VERSION}
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
-            - db:/var/lib/mysql
             - ./logs/php:/var/log/php
             - ./logs/xdebug:/tmp
         links:
@@ -60,7 +58,7 @@ services:
         build: ./config/${DB_SERVER_TYPE}
         container_name: ${PROJECT_NAME}-${DB_SERVER_TYPE}
         volumes:
-            - db:/var/lib/mysql
+            - db_path:/var/lib/mysql
             - ./logs/db:/var/log/mysql
         expose:
             - 3306
@@ -73,7 +71,7 @@ services:
         # image: memcached:1.5-alpine
         container_name: ${PROJECT_NAME}-memcached
         volumes:
-            - cache:/var/lib/memcached
+            - cache_path:/var/lib/memcached
             - ./logs/memcached:/var/log/memcached
         expose:
             - 11211
