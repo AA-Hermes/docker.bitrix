@@ -95,7 +95,13 @@ docker-compose up -d
 ## Примечание
 - По умолчанию стоит папка ```/var/www/bitrix/```
 - В настройках подключения требуется указывать имя сервиса, например для подключения к базе нужно указывать "db", а не "localhost". Пример [конфига](configs/.settings.php)  с подклчюением к mysql и memcached.
-- Для загрузки резервной копии в контейнер используйте команду: ```cat /var/www/bitrix/backup.sql | docker exec -i mysql /usr/bin/mysql -u root -p123 bitrix```
+- Для создания резервной копии (дампа) SQL: ```mysqldump -udb_user -pdb_password db_name > dump.sql```
+    - если нужна только схема: ```mysqldump --no-data > dump.sql```
+    - если нужны только данные: ```mysqldump --no-create-info > dump.sql```
+    - если нужно отключить таблицу : ```mysqldump --ignore-table=db_name.table_name > dump.sql```
+    - ключи выше можно комбинировать!!!
+- Для скачивания резервной копии (дампа) SQL с удалённого сервера используйте команду: ```scp -P 22 {server_user}@{server_id}:/home/bitrix/www/dump.sql dump.sql```
+- Для загрузки резервной копии (дампа) SQL в контейнер используйте команду: ```cat dump.sql | docker exec -i db mysql -udb_user -pdb_password db_name```
 
 ## Отличие от виртуальной машины Битрикс
 Виртуальная машина от разработчиков битрикс решает ту же задачу, что и BitrixDock - предоставляет готовое окружение. Разница лишь в том, что Docker намного удобнее, проще и легче в поддержке.
