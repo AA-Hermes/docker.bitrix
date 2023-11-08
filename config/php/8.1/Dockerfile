@@ -1,4 +1,4 @@
-FROM phpdockerio/php:8.1-fpm
+FROM php:8.1.17-fpm-alpine
 
 RUN apt-get update \
     && apt-get -y --no-install-recommends install \
@@ -14,15 +14,18 @@ RUN apt-get update \
     php8.1-imagick \
     php8.1-opcache \
     php8.1-zip \
-    php-pear php-dev libmcrypt gcc make autoconf libc-dev pkg-config \
+    php-pear php-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config \
     && pecl install mcrypt-1.0.3 \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-
 
 ADD ./php.ini /etc/php/8.1/fpm/conf.d/90-php.ini
 ADD ./php.ini /etc/php/8.1/cli/conf.d/90-php.ini
 
-RUN usermod -u 1000 www-data
+#Add UID '1000' to www-data
+# RUN usermod -u 1000 www-data
+# RUN adduser -G www-data -u 1000 -H $user
+# RUN addgroup -S -g 1000 www-data
+# RUN adduser -S -D -u 1000 -G $user $user
 
 WORKDIR "/var/www/bitrix"
 
