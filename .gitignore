@@ -1,7 +1,3 @@
-*
-!/config/*
-!.env_example
-!README.md
-!docker-compose.yml
-!LICENSE
-!.gitignore
+.env
+/data/*/*
+!/data/*/.gitkeep
