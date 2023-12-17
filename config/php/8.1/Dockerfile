@@ -19,12 +19,27 @@ RUN apk update && apk add --no-cache \
     autoconf \
     make \
     gcc
+    # for gd
+    # zlib1g-dev libpng-dev
 
 # magic installation of mysql & opcache
-RUN docker-php-ext-install mysqli opcache
 # RUN pecl install xdebug-3.2.1
-# RUN docker-php-ext-enable xdebug
+# RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    # && docker-php-ext-install -j$(nproc) gd
+RUN docker-php-ext-install mysqli opcache
 
+# Install dependencies for GD and install GD with support for jpeg, png webp and freetype
+# Info about installing GD in PHP https://www.php.net/manual/en/image.installation.php
+RUN apk add --no-cache \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
+    freetype-dev
+# As of PHP 7.4 we don't need to add --with-png
+RUN docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype
+RUN docker-php-ext-install gd
+
+# clear temp files
 RUN apk del gcc make autoconf libc-dev \
     && rm -rf /var/cache/apk/*
 
