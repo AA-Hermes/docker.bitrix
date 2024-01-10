@@ -22,8 +22,11 @@ RUN apk update && apk add --no-cache \
     # for gd
     # zlib1g-dev libpng-dev
 
+# Xdebug
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug;
+
 # magic installation of mysql & opcache
-# RUN pecl install xdebug-3.2.1
 # RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     # && docker-php-ext-install -j$(nproc) gd
 RUN docker-php-ext-install mysqli opcache
