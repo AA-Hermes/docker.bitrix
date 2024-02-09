@@ -1,5 +1,5 @@
 FROM node:20.4.0
-FROM php:8.1-fpm
+FROM php:8.0.23-fpm
 
 RUN docker-php-source extract && docker-php-source delete
 RUN apt-get --fix-missing update && apt-get install -y \
