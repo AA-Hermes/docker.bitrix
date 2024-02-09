@@ -38,7 +38,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # clear temp files
 RUN apt-get autoremove --purge -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ADD ./php.ini /usr/local/etc/php/php.ini
+ADD ./php.ini /usr/local/etc/php/conf.d/php.ini
+ADD ./php.ini /etc/php/8.0/fpm/conf.d/php.ini
+ADD ./php.ini /etc/php/8.0/cli/conf.d/php.ini
 
 WORKDIR "/var/www/bitrix"
 

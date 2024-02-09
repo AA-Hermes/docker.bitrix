@@ -1,3 +1,4 @@
+FROM node:20.4.0
 FROM phpdockerio/php:7.4-fpm
 
 RUN apt-get update \
