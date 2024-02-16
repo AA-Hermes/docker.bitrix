@@ -19,6 +19,9 @@ RUN apt-get install -y libpng-dev zlib1g-dev && docker-php-ext-install -j$(nproc
 # Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
+# mcrypt
+RUN pecl install mcrypt
+
 # Memcache
 RUN apt-get install -y libmemcached-dev zlib1g-dev libssl-dev \
     && pecl install memcache \
