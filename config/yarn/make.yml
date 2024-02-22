@@ -1,6 +1,6 @@
 version: '3'
 services:
-    yarn: 
+    yarn:
         build: ./yarn
         volumes:
-            - ./www:/usr/src/app
+            - ./www:/var/www/bitrix
