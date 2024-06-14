@@ -1,0 +1,12 @@
+version: "3.0"
+
+services:
+    yarn:
+        env_file: .env
+        build: ./config/yarn
+        container_name: ${PROJECT_NAME}-yarn
+        volumes:
+            - ${SITE_PATH}:/var/www/bitrix
+        networks:
+            - back
+        restart: none

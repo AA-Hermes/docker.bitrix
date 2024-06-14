@@ -3,3 +3,4 @@
 !/data/*/.gitkeep
 /logs/*/*
 !/logs/*/.gitkeep
+docker-compose.override.yml
