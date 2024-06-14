@@ -2,4 +2,4 @@
 
 # создание образа
 front:
-		docker compose -f make.yml up
+	docker compose -f make.yml up
