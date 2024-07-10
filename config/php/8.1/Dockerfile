@@ -6,15 +6,19 @@ RUN apt-get --fix-missing update && apt-get install -y \
     nano \
     wget \
     curl \
+    webp \
+    libjpeg-dev \
+    libfreetype6-dev \
     # install PHP extension compile dependencies foor pecl
     $PHPIZE_DEPS
 
+RUN apt-get install -y webp
 # Extensions:
 # Install dependencies for GD and install GD with support for jpeg, png webp and freetype
 # Info about installing GD in PHP https://www.php.net/manual/en/image.installation.php
 RUN apt-get install -y libpng-dev zlib1g-dev && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mysqli
 # RUN docker-php-ext-install -j$(nproc) gd sockets bcmath zip pdo_mysql intl exif
-# RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 
 # Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
