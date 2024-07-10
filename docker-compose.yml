@@ -36,6 +36,8 @@ services:
         networks:
             - back
             - proxy-network
+        links:
+            - php
         restart: unless-stopped
     php:
         env_file: .env
