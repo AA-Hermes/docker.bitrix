@@ -19,7 +19,6 @@ RUN apt-get update \
     && php-pear php7.4-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config \
     && docker-php-ext-enable xdebug \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-
 ADD ./php.ini /etc/php/7.4/fpm/conf.d/php.ini
 ADD ./php.ini /etc/php/7.4/cli/conf.d/php.ini
 

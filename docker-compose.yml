@@ -1,4 +1,4 @@
-version: "3.0"
+version: "3.2"
 
 volumes:
     db_path:
@@ -25,7 +25,7 @@ services:
     server:
         env_file: .env
         build: ./config/${WEB_SERVER_TYPE}
-        mem_limit: 512M
+        mem_limit: 128M
         container_name: ${PROJECT_NAME}-${WEB_SERVER_TYPE}
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
@@ -42,12 +42,11 @@ services:
     php:
         env_file: .env
         build: ./config/php/${PHP_VERSION}
-        mem_limit: 1024M
+        mem_limit: 512M
         container_name: ${PROJECT_NAME}-php${PHP_VERSION}
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
             - ./logs/php:/var/log/php
-            - ./logs/xdebug:/tmp
         links:
             - db
             - memcached
@@ -57,7 +56,7 @@ services:
     db:
         env_file: .env
         build: ./config/${DB_SERVER_TYPE}
-        mem_limit: 2048M
+        mem_limit: 1024M
         container_name: ${PROJECT_NAME}-${DB_SERVER_TYPE}
         volumes:
             - db_path:/var/lib/mysql
@@ -70,7 +69,7 @@ services:
     memcached:
         env_file: .env
         build: ./config/memcached
-        mem_limit: 512M
+        mem_limit: 128M
         container_name: ${PROJECT_NAME}-memcached
         volumes:
             - cache_path:/var/lib/memcached
