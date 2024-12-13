@@ -24,6 +24,11 @@ RUN apt-get install -y libpng-dev zlib1g-dev && docker-php-ext-install -j$(nproc
 # Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
+# Install PHP LDAP extension
+RUN apt-get update && apt-get install -y libldap2-dev \
+    && docker-php-ext-configure ldap --with-libdir=/lib/x86_64-linux-gnu \
+    && docker-php-ext-install ldap
+
 # mcrypt
 RUN apt-get install -y libmcrypt-dev && pecl install mcrypt
 
