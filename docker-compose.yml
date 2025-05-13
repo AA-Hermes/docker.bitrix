@@ -97,4 +97,4 @@ services:
         container_name: ${PROJECT_NAME}-analyzer
         volumes:
             - db_logs:/var/log/mysql
-            - php_logs:/var/log/mysql
+            - php_logs:/var/log/php
