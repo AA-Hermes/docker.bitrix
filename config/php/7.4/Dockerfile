@@ -1,6 +1,7 @@
 FROM node:20.4.0
 FROM phpdockerio/php:7.4-fpm
 
+# Установка инструментов
 RUN apt-get update \
     && apt-get -y --no-install-recommends install \
     php7.4-memcached \
@@ -19,11 +20,14 @@ RUN apt-get update \
     && php-pear php7.4-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config \
     && docker-php-ext-enable xdebug \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+
+# Копируем конфиги
 ADD ./php.ini /etc/php/7.4/fpm/conf.d/php.ini
 ADD ./php.ini /etc/php/7.4/cli/conf.d/php.ini
+## Копируем slowlog конфигурацию
+COPY ./www-custom.conf /etc/php/7.4/fpm/pool.d/zz-www-custom.conf
+
 
 RUN usermod -u 1000 www-data
-
 WORKDIR "/var/www/bitrix"
-
 EXPOSE 9000

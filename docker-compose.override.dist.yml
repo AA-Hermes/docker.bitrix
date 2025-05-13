@@ -1,12 +1,23 @@
-version: "3.0"
-
 services:
+    # yarn - Node.js package manager
     yarn:
         env_file: .env
         build: ./config/yarn
         container_name: ${PROJECT_NAME}-yarn
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
+        networks:
+            - back
+        restart: none
+
+    # webgrind - Xdebug profiling web interface
+    webgrind:
+        image: jokkedk/webgrind:latest
+        container_name: ${PROJECT_NAME}-webgrind
+        volumes:
+            - ./logs/php/xdebug:/tmp
+        ports:
+          - "8081:80"
         networks:
             - back
         restart: none
