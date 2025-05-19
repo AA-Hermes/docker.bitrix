@@ -3,12 +3,7 @@
 # │ │ ┌───────────── день месяца (1–31)
 # │ │ │ ┌───────────── месяц (1–12)
 # │ │ │ │ ┌───────────── день недели (0–7) (вс = 0 или 7)
-# │ │ │ │ │
-# │ │ │ │ │
-# * * * * * команда
-
 # Запуск анализа логов MySQL каждые 30 минут
-*/30 * * * * root /bin/bash /usr/local/bin/analyze-log.sh >> /var/log/mysql/cron.log 2>&1
-
+30 * * * * root /bin/bash /usr/local/bin/analyze-log.sh >> /var/log/mysql/cron.log 2>&1
 # Удаление логов xdebug старше 1 дня
 0 * * * * root find /var/log/php/xdebug -type f -mtime +1 -delete
