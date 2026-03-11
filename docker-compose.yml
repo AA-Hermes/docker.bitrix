@@ -24,6 +24,12 @@ volumes:
             type: 'none'
             device: './logs/php'
 
+x-default-logging: &default-logging
+    driver: json-file
+    options:
+        max-size: '10m'
+        max-file: '5'
+
 networks:
     back:
         driver: bridge
@@ -37,6 +43,7 @@ services:
         build: ./config/${WEB_SERVER_TYPE}
         mem_limit: 128M
         container_name: ${PROJECT_NAME}-${WEB_SERVER_TYPE}
+        logging: *default-logging
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
             - ./logs/${WEB_SERVER_TYPE}:/var/log/${WEB_SERVER_TYPE}
@@ -56,6 +63,7 @@ services:
         build: ./config/php/${PHP_VERSION}
         mem_limit: 512M
         container_name: ${PROJECT_NAME}-php${PHP_VERSION}
+        logging: *default-logging
         volumes:
             - ${SITE_PATH}:/var/www/bitrix
             - php_logs:/var/log/php
@@ -70,6 +78,7 @@ services:
         build: ./config/${DB_SERVER_TYPE}
         mem_limit: 1024M
         container_name: ${PROJECT_NAME}-${DB_SERVER_TYPE}
+        logging: *default-logging
         volumes:
             - db_path:/var/lib/mysql
             - db_logs:/var/log/mysql
@@ -82,7 +91,9 @@ services:
         env_file: .env
         build: ./config/memcached
         mem_limit: 128M
+        cpus: 1
         container_name: ${PROJECT_NAME}-memcached
+        logging: *default-logging
         volumes:
             - cache_path:/var/lib/memcached
             - ./logs/memcached:/var/log/memcached
@@ -95,6 +106,23 @@ services:
     analyzer:
         build: ./config/analyzer
         container_name: ${PROJECT_NAME}-analyzer
+        mem_limit: 1024M
+        cpus: 1
+        logging: *default-logging
         volumes:
             - db_logs:/var/log/mysql
             - php_logs:/var/log/php
+
+    logrotate:
+        build: ./config/logrotate
+        container_name: ${PROJECT_NAME}-logrotate
+        logging: *default-logging
+        volumes:
+            - ./logs/nginx:/var/log/nginx
+            - ./logs/php:/var/log/php
+            - ./logs/db:/var/log/mysql
+            - ./logs/memcached:/var/log/memcached
+            - ./data/logrotate:/var/lib/logrotate
+        environment:
+            LOGROTATE_INTERVAL: 3600
+        restart: unless-stopped

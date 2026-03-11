@@ -139,6 +139,21 @@ https://github.com/bitrixdock/bitrixdock-production
 Реальные проекты на основе этих проектов работают годами без проблем если их не трогать )
 ![Alt text](assets/Clip2net_200727170318.png?raw=true "BitrixDock")
 
+## Ротация логов
+
+В проекте включена двухуровневая ротация логов:
+
+- `docker logs` ограничены через `logging.options` (`max-size=10m`, `max-file=5`)
+- файловые логи из `.server/logs/*` ротируются отдельным сервисом `logrotate`
+
+Ротация файловых логов выполняется раз в час и срабатывает при достижении файлами размера `50M`. Хранятся последние `48` архивов, старые файлы сжимаются.
+
+После изменения конфигурации перезапустите окружение:
+
+```bash
+docker compose up -d --build logrotate server php db memcached analyzer
+```
+
 # Для контрибьюторов
 // 1. Форкаем оригинальный проект https://github.com/bitrixdock/bitrixdock кнопкой Fork
 // 2. Клонируем форк себе на компьютер
