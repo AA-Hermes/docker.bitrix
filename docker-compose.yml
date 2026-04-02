@@ -42,6 +42,7 @@ services:
         env_file: .env
         build: ./config/${WEB_SERVER_TYPE}
         mem_limit: 512M
+        cpus: 1
         container_name: ${PROJECT_NAME}-${WEB_SERVER_TYPE}
         logging: *default-logging
         volumes:
@@ -62,6 +63,7 @@ services:
         env_file: .env
         build: ./config/php/${PHP_VERSION}
         mem_limit: 512M
+        cpus: 1
         container_name: ${PROJECT_NAME}-php${PHP_VERSION}
         logging: *default-logging
         volumes:
@@ -107,7 +109,7 @@ services:
         build: ./config/analyzer
         container_name: ${PROJECT_NAME}-analyzer
         mem_limit: 1024M
-        cpus: 1
+        cpus: 0.5
         logging: *default-logging
         volumes:
             - db_logs:/var/log/mysql
@@ -116,6 +118,8 @@ services:
     logrotate:
         build: ./config/logrotate
         container_name: ${PROJECT_NAME}-logrotate
+        mem_limit: 128M
+        cpus: 0.5
         logging: *default-logging
         volumes:
             - ./logs/nginx:/var/log/nginx
