@@ -1,132 +1,202 @@
 volumes:
-    db_path:
-        driver: local
-        driver_opts:
-            o: 'bind'
-            type: 'none'
-            device: './data/mysql'
-    db_logs:
-        driver: local
-        driver_opts:
-            o: 'bind'
-            type: 'none'
-            device: './logs/db'
-    cache_path:
-        driver: local
-        driver_opts:
-            o: 'bind'
-            type: 'none'
-            device: './data/cache'
-    php_logs:
-        driver: local
-        driver_opts:
-            o: 'bind'
-            type: 'none'
-            device: './logs/php'
+  db_path:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: './data/mysql'
+  db_logs:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: './logs/db'
+  cache_path:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: './data/cache'
+  php_logs:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: './logs/php'
 
 x-default-logging: &default-logging
-    driver: json-file
-    options:
-        max-size: '10m'
-        max-file: '5'
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
 
 networks:
-    back:
-        driver: bridge
-    proxy-network:
-        name: proxy-network
-        external: true
+  back:
+    driver: bridge
+  proxy-network:
+    name: proxy-network
+    external: true
 
 services:
-    server:
-        env_file: .env
-        build: ./config/${WEB_SERVER_TYPE}
-        mem_limit: 512M
-        cpus: 1
-        container_name: ${PROJECT_NAME}-${WEB_SERVER_TYPE}
-        logging: *default-logging
-        volumes:
-            - ${SITE_PATH}:/var/www/bitrix
-            - ./logs/${WEB_SERVER_TYPE}:/var/log/${WEB_SERVER_TYPE}
-        expose:
-            - 80
-            - 443
-        networks:
-            - back
-            - proxy-network
-        links:
-            - php
-        restart: unless-stopped
-    php:
-        cap_add:
-            - SYS_PTRACE
-        env_file: .env
-        build: ./config/php/${PHP_VERSION}
-        mem_limit: 512M
-        cpus: 1
-        container_name: ${PROJECT_NAME}-php${PHP_VERSION}
-        logging: *default-logging
-        volumes:
-            - ${SITE_PATH}:/var/www/bitrix
-            - php_logs:/var/log/php
-        links:
-            - db
-            - memcached
-        networks:
-            - back
-        restart: unless-stopped
-    db:
-        env_file: .env
-        build: ./config/${DB_SERVER_TYPE}
-        mem_limit: 1024M
-        container_name: ${PROJECT_NAME}-${DB_SERVER_TYPE}
-        logging: *default-logging
-        volumes:
-            - db_path:/var/lib/mysql
-            - db_logs:/var/log/mysql
-        expose:
-            - 3306
-        networks:
-            - back
-        restart: unless-stopped
-    memcached:
-        env_file: .env
-        build: ./config/memcached
-        mem_limit: 128M
-        cpus: 1
-        container_name: ${PROJECT_NAME}-memcached
-        logging: *default-logging
-        volumes:
-            - cache_path:/var/lib/memcached
-            - ./logs/memcached:/var/log/memcached
-        expose:
-            - 11211
-        networks:
-            - back
-        restart: unless-stopped
+  server:
+    env_file: .env
+    build: ./config/${WEB_SERVER_TYPE}
+    mem_limit: 512M
+    cpus: 1
+    container_name: ${PROJECT_NAME}-${WEB_SERVER_TYPE}
+    logging: *default-logging
+    volumes:
+      - ${SITE_PATH}:/var/www/bitrix
+      - ./logs/${WEB_SERVER_TYPE}:/var/log/${WEB_SERVER_TYPE}
+    expose:
+      - 80
+      - 443
+    networks:
+      - back
+      - proxy-network
+    links:
+      - php
+    restart: unless-stopped
+  php:
+    cap_add:
+      - SYS_PTRACE
+    env_file: .env
+    build: ./config/php/${PHP_VERSION}
+    mem_limit: 512M
+    cpus: 1
+    container_name: ${PROJECT_NAME}-php${PHP_VERSION}
+    logging: *default-logging
+    volumes:
+      - ${SITE_PATH}:/var/www/bitrix
+      - php_logs:/var/log/php
+    links:
+      - db
+      - memcached
+    networks:
+      - back
+    restart: unless-stopped
+  db:
+    env_file: .env
+    build: ./config/${DB_SERVER_TYPE}
+    mem_limit: 1024M
+    container_name: ${PROJECT_NAME}-${DB_SERVER_TYPE}
+    logging: *default-logging
+    volumes:
+      - db_path:/var/lib/mysql
+      - db_logs:/var/log/mysql
+    expose:
+      - 3306
+    networks:
+      - back
+    restart: unless-stopped
+  memcached:
+    env_file: .env
+    build: ./config/memcached
+    mem_limit: 128M
+    cpus: 1
+    container_name: ${PROJECT_NAME}-memcached
+    logging: *default-logging
+    volumes:
+      - cache_path:/var/lib/memcached
+      - ./logs/memcached:/var/log/memcached
+    expose:
+      - 11211
+    networks:
+      - back
+    restart: unless-stopped
 
-    analyzer:
-        build: ./config/analyzer
-        container_name: ${PROJECT_NAME}-analyzer
-        mem_limit: 1024M
-        cpus: 0.5
-        logging: *default-logging
-        volumes:
-            - db_logs:/var/log/mysql
-            - php_logs:/var/log/php
+  analyzer:
+    build: ./config/analyzer
+    container_name: ${PROJECT_NAME}-analyzer
+    mem_limit: 1024M
+    cpus: 0.5
+    logging: *default-logging
+    volumes:
+      - db_logs:/var/log/mysql
+      - php_logs:/var/log/php
 
-    logrotate:
-        build: ./config/logrotate
-        container_name: ${PROJECT_NAME}-logrotate
-        mem_limit: 128M
-        cpus: 0.5
-        logging: *default-logging
-        volumes:
-            - ./logs/nginx:/var/log/nginx
-            - ./logs/php:/var/log/php
-            - ./logs/db:/var/log/mysql
-            - ./logs/memcached:/var/log/memcached
-            - ./data/logrotate:/var/lib/logrotate
-        environment:
-            LOGROTATE_INTERVAL: 3600
-        restart: unless-stopped
+  logrotate:
+    build: ./config/logrotate
+    container_name: ${PROJECT_NAME}-logrotate
+    mem_limit: 128M
+    cpus: 0.5
+    logging: *default-logging
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+      - ./logs/php:/var/log/php
+      - ./logs/db:/var/log/mysql
+      - ./logs/memcached:/var/log/memcached
+      - ./data/logrotate:/var/lib/logrotate
+    environment:
+      LOGROTATE_INTERVAL: 3600
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: ${PROJECT_NAME}-node-exporter
+    restart: unless-stopped
+    networks:
+      - proxy-network
+    expose:
+      - 9100
+    mem_limit: 64M
+    cpus: 0.2
+    labels:
+      prometheus.scrape: "true"
+      prometheus.job: "node"
+      prometheus.host: "${PROJECT_NAME}"
+      prometheus.port: "9100"
+      prometheus.path: "/metrics"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: ${PROJECT_NAME}-mysqld-exporter
+    restart: unless-stopped
+    environment:
+      - MYSQLD_EXPORTER_PASSWORD=${MYSQL_PASSWORD:-exporter_password}
+    command:
+      - '--mysqld.address=db:3306'
+      - '--mysqld.username=${MYSQL_USER:-exporter}'
+      - '--no-exporter.enable_lock_wait_timeout'
+    networks:
+      - back
+      - proxy-network
+    expose:
+      - 9104
+    mem_limit: 64M
+    cpus: 0.2
+    labels:
+      prometheus.scrape: "true"
+      prometheus.job: "mysql"
+      prometheus.host: "${PROJECT_NAME}"
+      prometheus.port: "9104"
+      prometheus.path: "/metrics"
+
+  memcached-exporter:
+    image: prom/memcached-exporter:latest
+    container_name: ${PROJECT_NAME}-memcached-exporter
+    restart: unless-stopped
+    command:
+      - '--memcached.address=memcached:11211'
+    networks:
+      - back
+      - proxy-network
+    expose:
+      - 9150
+    mem_limit: 64M
+    cpus: 0.2
+    labels:
+      prometheus.scrape: "true"
+      prometheus.job: "memcached"
+      prometheus.host: "${PROJECT_HOST}"
+      prometheus.port: "9150"
+      prometheus.path: "/metrics"
