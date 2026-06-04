@@ -1,0 +1,50 @@
+.PHONY: test test-dir test-all help
+
+help:
+	@echo "Доступные команды для запуска тестов:"
+	@echo ""
+	@echo "  make test              - запустить все тесты"
+	@echo "  make test-dir DIR=<dir> - запустить тесты директории"
+	@echo "  make test-filter FILTER=<filter> - запустить тесты с фильтром"
+	@echo "  make test-all          - полный прогон всех тестов с отчетом"
+	@echo ""
+	@echo "Примеры:"
+	@echo "  make test"
+	@echo "  make test-dir DIR=local/modules/germes.exchange"
+	@echo "  make test-filter FILTER=UserTest"
+
+# Запустить все тесты
+test:
+	bash run-tests.sh
+
+# Запустить тесты конкретной директории
+test-dir:
+	@if [ -z "$(DIR)" ]; then \
+		echo "Ошибка: укажите DIR=<path>"; \
+		echo "Пример: make test-dir DIR=local/modules/germes.exchange"; \
+		exit 1; \
+	fi
+	bash run-test-dir.sh $(DIR)
+
+# Запустить тесты с фильтром
+test-filter:
+	@if [ -z "$(FILTER)" ]; then \
+		echo "Ошибка: укажите FILTER=<filter>"; \
+		echo "Пример: make test-filter FILTER=UserTest"; \
+		exit 1; \
+	fi
+	bash run-test-dir.sh local/tests -- --filter $(FILTER)
+
+# Полный прогон со всеми опциями
+test-all:
+	bash run-tests.sh
+
+# Запустить конкретный модуль
+test-germes-exchange:
+	bash run-test-dir.sh local/modules/germes.exchange
+
+test-germes-multibasket:
+	bash run-test-dir.sh local/modules/germes.multibasket/tests
+
+test-core:
+	bash run-test-dir.sh local/tests
