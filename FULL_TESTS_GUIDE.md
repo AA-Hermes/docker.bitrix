@@ -206,18 +206,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Start Docker Compose
         run: |
           cd .server
           docker-compose up -d
           sleep 10
-      
+
       - name: Run Tests
         run: |
           cd .server
           bash run-tests-ci.sh
-      
+
       - name: Stop Docker Compose
         if: always()
         run: |
@@ -258,7 +258,7 @@ test:
 ```groovy
 pipeline {
     agent any
-    
+
     stages {
         stage('Setup') {
             steps {
@@ -268,7 +268,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 dir('.server') {
@@ -277,7 +277,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             dir('.server') {

@@ -13,26 +13,26 @@ services:
       bash -c "
         echo 'Ожидание инициализации сервисов...'
         sleep 5
-        
+
         echo '═════════════════════════════════════════════'
         echo 'Запуск PHPUnit тестов'
         echo '═════════════════════════════════════════════'
         echo ''
-        
+
         TOTAL=0
         PASSED=0
         FAILED=0
-        
+
         # Находим все phpunit.xml
         for phpunit_file in \$$(find /var/www/bitrix/local -name 'phpunit.xml' -type f); do
           test_dir=\$$(dirname \$phpunit_file)
           test_dir_relative=\$$(echo \$test_dir | sed 's|/var/www/bitrix/||')
-          
+
           TOTAL=\$((TOTAL + 1))
-          
+
           echo \"📋 Тест \$TOTAL: \$test_dir_relative\"
           echo \"────────────────────────────────────────────\"
-          
+
           if cd \$test_dir && php /usr/bin/phpunit --configuration phpunit.xml --colors=always; then
             echo \"✓ Успешно: \$test_dir_relative\"
             PASSED=\$((PASSED + 1))
@@ -40,14 +40,14 @@ services:
             echo \"✗ Ошибка: \$test_dir_relative\"
             FAILED=\$((FAILED + 1))
           fi
-          
+
           echo ''
         done
-        
+
         echo '═════════════════════════════════════════════'
         echo \"Итоги: Всего=\$TOTAL | Успешно=\$PASSED | Ошибки=\$FAILED\"
         echo '═════════════════════════════════════════════'
-        
+
         if [ \$FAILED -gt 0 ]; then
           exit 1
         fi

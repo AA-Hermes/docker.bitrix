@@ -43,8 +43,9 @@ RUN docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
 	zip
 
 # Extensions distributed via PECL (pin versions for stable reproducible builds).
-RUN pecl install \
-	imagick \
+RUN pecl channel-update pecl.php.net \
+	&& pecl install \
+	imagick-3.7.0 \
 	memcache-4.0.5.2 \
 	memcached-3.2.0 \
 	mcrypt-1.0.4 \

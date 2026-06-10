@@ -236,19 +236,19 @@ test:
 ```groovy
 pipeline {
     agent any
-    
+
     options {
         timestamps()
         timeout(time: 30, unit: 'MINUTES')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
+
         stage('Setup') {
             steps {
                 dir('.server') {
@@ -257,7 +257,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 dir('.server') {
@@ -266,7 +266,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             dir('.server') {

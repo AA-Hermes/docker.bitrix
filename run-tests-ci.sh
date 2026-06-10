@@ -62,34 +62,34 @@ FAILED_DIRS=()
 for phpunit_file in $PHPUNIT_FILES; do
     test_dir=$(dirname "$phpunit_file")
     test_dir_relative=$(echo "$test_dir" | sed 's|^\.\./||')
-    
+
     TOTAL=$((TOTAL + 1))
-    
+
     log "Запуск тестов для: $test_dir_relative ($TOTAL)"
-    
+
     # Подготавливаем команду phpunit
     PHPUNIT_CMD="php ./vendor/bin/phpunit --configuration phpunit.xml"
-    
+
     # Добавляем опции для покрытия кода если указано
     if [ "$COVERAGE" = "1" ]; then
         COVERAGE_DIR="/tmp/coverage/$test_dir_relative"
         PHPUNIT_CMD="$PHPUNIT_CMD --coverage-clover=$COVERAGE_DIR/clover.xml"
         PHPUNIT_CMD="$PHPUNIT_CMD --coverage-text=$COVERAGE_DIR/coverage.txt"
-        
+
         if [ ! -z "$COVERAGE_HTML" ]; then
             PHPUNIT_CMD="$PHPUNIT_CMD --coverage-html=$COVERAGE_DIR/html"
         fi
     fi
-    
+
     # Добавляем флаг verbose
     if [ "$VERBOSE" = "1" ]; then
         PHPUNIT_CMD="$PHPUNIT_CMD --verbose"
     fi
-    
+
     # Запускаем тесты
     if docker exec -w "/var/www/bitrix/$test_dir_relative" "$CONTAINER_NAME" \
         bash -c "$PHPUNIT_CMD"; then
-        
+
         success "$test_dir_relative"
         PASSED=$((PASSED + 1))
     else
@@ -116,18 +116,18 @@ if [ $FAILED -gt 0 ]; then
     for dir in "${FAILED_DIRS[@]}"; do
         echo "  - $dir"
     done
-    
+
     # Экспортируем переменные для использования в CI
     echo "TESTS_PASSED=$PASSED" >> "$GITHUB_ENV" 2>/dev/null || true
     echo "TESTS_FAILED=$FAILED" >> "$GITHUB_ENV" 2>/dev/null || true
-    
+
     exit 1
 else
     success "Все тесты пройдены успешно!"
-    
+
     # Экспортируем переменные для использования в CI
     echo "TESTS_PASSED=$PASSED" >> "$GITHUB_ENV" 2>/dev/null || true
     echo "TESTS_FAILED=0" >> "$GITHUB_ENV" 2>/dev/null || true
-    
+
     exit 0
 fi

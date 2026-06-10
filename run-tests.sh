@@ -5,6 +5,41 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+DEBUG_MODE=0
+PHPUNIT_ARGS=()
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --debug|-d)
+            DEBUG_MODE=1
+            shift
+            ;;
+        --help|-h)
+            echo "Использование: $0 [--debug] [-- <аргументы PHPUnit>]"
+            echo ""
+            echo "  --debug, -d   Включить Xdebug для остановки на брейкпоинтах в VS Code"
+            echo ""
+            echo "Примеры:"
+            echo "  $0"
+            echo "  $0 --debug"
+            echo "  $0 --debug -- --testsuite UnitTests --filter DocumentCollectionTest"
+            exit 0
+            ;;
+        --)
+            shift
+            PHPUNIT_ARGS+=("$@")
+            break
+            ;;
+        *)
+            PHPUNIT_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
 # Цвета для вывода
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -25,6 +60,9 @@ FAILED_DIRS=()
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BLUE}Запуск PHPUnit тестов в контейнере: ${CONTAINER_NAME}${NC}"
+if [ "$DEBUG_MODE" -eq 1 ]; then
+    echo -e "${YELLOW}Xdebug включен: запустите в VS Code конфигурацию 'Listen for PHPUnit Docker Xdebug'${NC}"
+fi
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -53,17 +91,26 @@ for phpunit_file in $PHPUNIT_FILES; do
     # Получаем директорию с phpunit.xml
     test_dir=$(dirname "$phpunit_file")
     test_dir_relative=$(echo "$test_dir" | sed 's|^\.\./||')
-    
+
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
-    
+
     echo -e "${BLUE}─────────────────────────────────────────────────────────────${NC}"
     echo -e "${BLUE}Тест ${TOTAL_TESTS}/${FILE_COUNT}: ${test_dir_relative}${NC}"
     echo -e "${BLUE}─────────────────────────────────────────────────────────────${NC}"
-    
+
+    DOCKER_EXEC_ARGS=(-w "/var/www/bitrix/$test_dir_relative")
+    if [ "$DEBUG_MODE" -eq 1 ]; then
+        DOCKER_EXEC_ARGS+=(
+            -e XDEBUG_MODE=develop,debug
+            -e XDEBUG_TRIGGER=PHPUNIT
+            -e PHP_IDE_CONFIG=serverName=fit24-docker
+        )
+    fi
+
     # Запускаем тесты внутри контейнера
-    if docker exec -w "/var/www/bitrix/$test_dir_relative" "$CONTAINER_NAME" \
-        php ./vendor/bin/phpunit --configuration phpunit.xml --colors=always; then
-        
+    if docker exec "${DOCKER_EXEC_ARGS[@]}" "$CONTAINER_NAME" \
+        php ./vendor/bin/phpunit --configuration phpunit.xml --colors=always "${PHPUNIT_ARGS[@]}"; then
+
         echo -e "${GREEN}✓ Успешно: ${test_dir_relative}${NC}"
         PASSED_TESTS=$((PASSED_TESTS + 1))
     else
@@ -71,7 +118,7 @@ for phpunit_file in $PHPUNIT_FILES; do
         FAILED_TESTS=$((FAILED_TESTS + 1))
         FAILED_DIRS+=("$test_dir_relative")
     fi
-    
+
     echo ""
 done
 
