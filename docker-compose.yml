@@ -1,4 +1,10 @@
 volumes:
+  bitrix_cache:
+  bitrix_managed_cache:
+  bitrix_stack_cache:
+  bitrix_html_cache:
+  bitrix_upload_resize_cache:
+  bitrix_sessions:
   db_path:
     driver: local
     driver_opts:
@@ -47,6 +53,12 @@ services:
     logging: *default-logging
     volumes:
       - ${SITE_PATH}:/var/www/bitrix
+      - bitrix_cache:/var/www/bitrix/bitrix/cache
+      - bitrix_managed_cache:/var/www/bitrix/bitrix/managed_cache
+      - bitrix_stack_cache:/var/www/bitrix/bitrix/stack_cache
+      - bitrix_html_cache:/var/www/bitrix/bitrix/html_pages
+      - bitrix_upload_resize_cache:/var/www/bitrix/upload/resize_cache
+      - bitrix_sessions:/var/www/bitrix/bitrix/php_interface/sessions
       - ./logs/${WEB_SERVER_TYPE}:/var/log/${WEB_SERVER_TYPE}
     expose:
       - 80
@@ -68,6 +80,12 @@ services:
     logging: *default-logging
     volumes:
       - ${SITE_PATH}:/var/www/bitrix
+      - bitrix_cache:/var/www/bitrix/bitrix/cache
+      - bitrix_managed_cache:/var/www/bitrix/bitrix/managed_cache
+      - bitrix_stack_cache:/var/www/bitrix/bitrix/stack_cache
+      - bitrix_html_cache:/var/www/bitrix/bitrix/html_pages
+      - bitrix_upload_resize_cache:/var/www/bitrix/upload/resize_cache
+      - bitrix_sessions:/var/www/bitrix/bitrix/php_interface/sessions
       - php_logs:/var/log/php
     links:
       - db
