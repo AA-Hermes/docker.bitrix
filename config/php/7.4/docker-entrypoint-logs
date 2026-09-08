@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+touch /var/log/php/error.log
+chown www-data:www-data /var/log/php/error.log
+chmod 0664 /var/log/php/error.log
+
+exec docker-php-entrypoint "$@"

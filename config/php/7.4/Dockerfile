@@ -61,7 +61,13 @@ RUN apt-get autoremove --purge -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp
 # Local PHP/FPM overrides for this environment.
 ADD ./php.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./www-custom.conf /usr/local/etc/php-fpm.d/zz-www-custom.conf
+COPY ./docker-entrypoint-logs /usr/local/bin/docker-entrypoint-logs
 
-RUN usermod -u 1000 www-data
+RUN chmod +x /usr/local/bin/docker-entrypoint-logs \
+	&& usermod -u 1000 www-data
+
+ENTRYPOINT ["docker-entrypoint-logs"]
+CMD ["php-fpm"]
+
 WORKDIR "/var/www/bitrix"
 EXPOSE 9000
