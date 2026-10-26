@@ -151,8 +151,30 @@ https://github.com/bitrixdock/bitrixdock-production
 После изменения конфигурации перезапустите окружение:
 
 ```bash
-docker compose up -d --build logrotate server php db memcached analyzer
+docker compose up -d --build logrotate server php db memcached
 ```
+
+## Мониторинг и анализ логов
+
+Обычный `docker compose up -d` не запускает `analyzer` и сервисы `*-exporter`. Для запуска с мониторингом выполните из каталога Compose-файлов:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+```
+
+Если используется локальный `docker-compose.override.yml`, укажите его явно:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.monitoring.yml up -d
+```
+
+Ранее запущенные сервисы мониторинга можно остановить:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.monitoring.yml stop analyzer node-exporter mysqld-exporter memcached-exporter
+```
+
+Ротация файловых логов и ограничения `docker logs` остаются включены в базовом конфиге.
 
 # Для контрибьюторов
 // 1. Форкаем оригинальный проект https://github.com/bitrixdock/bitrixdock кнопкой Fork
