@@ -2,7 +2,13 @@ FROM node:20.4.0
 FROM php:8.0.23-fpm
 
 RUN docker-php-source extract && docker-php-source delete
-RUN apt-get --fix-missing update && apt-get install -y \
+# Debian Bullseye repositories are archived; keep package signature verification enabled.
+RUN printf '%s\n' \
+    'deb [check-valid-until=no] https://archive.debian.org/debian bullseye main' \
+    'deb [check-valid-until=no] https://archive.debian.org/debian-security bullseye-security main' \
+    > /etc/apt/sources.list \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get update && apt-get install -y \
     nano \
     wget \
     curl \
@@ -17,7 +23,8 @@ RUN apt-get install -y libpng-dev zlib1g-dev && docker-php-ext-install -j$(nproc
 # RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 
 # Xdebug
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+# Pin a release compatible with PHP 8.0.
+RUN pecl install xdebug-3.4.7 && docker-php-ext-enable xdebug
 
 # Memcache
 RUN apt-get install -y libmemcached-dev zlib1g-dev libssl-dev \
